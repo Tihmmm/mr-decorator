@@ -68,7 +68,7 @@ func (c *HttpClient) GetArtifact(projectId int, jobId int, artifactFileName stri
 	}(resp.Body)
 
 	dirPath := filepath.Join(artifactsBaseDir, uuid.New().String())
-	if err := os.MkdirAll(dirPath, os.ModePerm); err != nil {
+	if err := os.MkdirAll(dirPath, 0750); err != nil {
 		log.Printf("Error creating artifact directory: %s\n", err)
 	}
 	filePath := filepath.Join(dirPath, artifactFileName)
