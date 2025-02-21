@@ -2,6 +2,7 @@ package models
 
 type MRRequest struct {
 	AuthToken           string `json:"auth_token" validate:"required"`
+	FilePath            string
 	ProjectId           int    `json:"project_id" validate:"required"`
 	JobId               int    `json:"job_id" validate:"required"`
 	ArtifactFormat      string `json:"format" validate:"required"`

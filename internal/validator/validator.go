@@ -8,7 +8,9 @@ import (
 )
 
 type Validator interface {
-	Validate(reqBody *models.MRRequest) bool
+	IsValidAll(reqBody *models.MRRequest) bool
+	IsValidStruct(reqBody *models.MRRequest) bool
+	isValidArtifactFileName(fileName string) bool
 }
 
 type RequestValidator struct {
@@ -23,21 +25,21 @@ func NewValidator() Validator {
 	}
 }
 
-func (v *RequestValidator) Validate(reqBody *models.MRRequest) bool {
-	return v.ValidateStruct(reqBody) && v.ValidateArtifactFileName(reqBody.ArtifactFileName)
+func (v *RequestValidator) IsValidAll(reqBody *models.MRRequest) bool {
+	return v.IsValidStruct(reqBody) && v.isValidArtifactFileName(reqBody.ArtifactFileName)
 }
 
-func (v *RequestValidator) ValidateStruct(reqBody *models.MRRequest) bool {
+func (v *RequestValidator) IsValidStruct(reqBody *models.MRRequest) bool {
 	err := v.jsonValidator.Struct(reqBody)
 	if err == nil {
 		return true
 	}
 
-	log.Printf("Error validating request body: %s\n", err)
+	log.Printf("Error validating struct: %s\n", err)
 	return false
 }
 
-func (v *RequestValidator) ValidateArtifactFileName(fileName string) bool {
+func (v *RequestValidator) isValidArtifactFileName(fileName string) bool {
 	if slices.Contains(v.validFilenames, fileName) {
 		return true
 	}
