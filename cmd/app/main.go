@@ -86,15 +86,7 @@ func run(cmd *cobra.Command, args []string) {
 	d := decorator.NewDecorator(mode, c, p)
 	switch mode {
 	case "cli":
-		if promptToken {
-			tokenBytes, err := terminal.ReadPassword(0)
-			if err != nil {
-				log.Fatal(err)
-			}
-			authToken = string(tokenBytes)
-		}
 		mr := &models.MRRequest{
-			AuthToken:           authToken,
 			FilePath:            path,
 			ProjectId:           projectId,
 			JobId:               jobId,
@@ -103,6 +95,17 @@ func run(cmd *cobra.Command, args []string) {
 			MergeRequestIid:     mergeRequestIid,
 			VulnerabilityMgmtId: vulnerabilityMgmtId,
 		}
+		if !v.IsValidAll(mr) {
+			os.Exit(127)
+		}
+		if promptToken {
+			tokenBytes, err := terminal.ReadPassword(0)
+			if err != nil {
+				log.Fatal(err)
+			}
+			authToken = string(tokenBytes)
+		}
+		mr.AuthToken = authToken
 		if err := d.DecorateCli(mr); err != nil {
 			log.Fatal(err)
 		}
