@@ -34,8 +34,7 @@ const waitTime = 4 * time.Second // waiting for artifacts to be loaded
 func (d *MRDecorator) DecorateServer(mrRequest *models.MRRequest) error {
 	time.Sleep(waitTime)
 
-	log.Printf("%s Started processing request: %v\n", time.Now().Format(time.DateTime), mrRequest)
-	artifactsDir := ""
+	log.Printf("%s Started processing request for project: %d, merge request id: %d, job id: %d\n", time.Now().Format(time.DateTime), mrRequest.ProjectId, mrRequest.MergeRequestIid, mrRequest.JobId)
 
 	artifactsDir, err := d.c.GetArtifact(mrRequest.ProjectId, mrRequest.JobId, mrRequest.ArtifactFileName, mrRequest.AuthToken)
 	if err != nil {
@@ -47,6 +46,7 @@ func (d *MRDecorator) DecorateServer(mrRequest *models.MRRequest) error {
 	if err != nil {
 		return err
 	}
+
 	err = d.c.SendNote(note, mrRequest.ProjectId, mrRequest.MergeRequestIid, mrRequest.AuthToken)
 	if err != nil {
 		return err

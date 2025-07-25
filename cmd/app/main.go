@@ -55,7 +55,8 @@ In either mode don't forget to set the following environment variables:
 
 func init() {
 	rootCmd.Flags().StringVarP(&mode, "mode", "m", "server", "Accepts either `cli` or `server`")
-	if mode == "cli" {
+	switch mode {
+	case "cli":
 		rootCmd.Flags().StringVarP(&authToken, "token", "t", "", "Gitlab auth token with `api` scope")
 		rootCmd.Flags().BoolVarP(&promptToken, "prompt-token", "p", false, "Prompt for Gitlab token")
 		rootCmd.MarkFlagsOneRequired("token", "prompt-token")
@@ -70,8 +71,10 @@ func init() {
 		rootCmd.Flags().StringVar(&artifactFileName, "artifact-file", "", "Filename of artifact")
 		rootCmd.Flags().IntVar(&mergeRequestIid, "mr-iid", -1, "Merge request internal ID")
 		rootCmd.MarkFlagsRequiredTogether("project-id", "job-id", "artifact-format", "artifact-file", "mr-iid")
-	} else if mode == "server" {
+	case "server":
 		rootCmd.Flags().StringVarP(&port, "port", "p", "-1", "Server port. If not specified, it will use the SERVER_PORT environment variable")
+	default:
+		log.Fatalf("Invalid mode: %s. Only `cli` and `server` are allowed", mode)
 	}
 }
 
@@ -108,7 +111,5 @@ func run(cmd *cobra.Command, args []string) {
 		if err := s.Start(port); err != nil {
 			log.Fatal(err)
 		}
-	default:
-		log.Fatalf("Invalid mode: %s. Only `cli` and `server` are allowed", mode)
 	}
 }
