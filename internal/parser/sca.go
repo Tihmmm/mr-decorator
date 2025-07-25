@@ -83,7 +83,7 @@ type cycloneDX struct {
 
 func (dx *cycloneDX) ToGenSca(cfg config.ScaParserConfig, vulnMgmtId int) GenSca {
 	var genSca GenSca
-	genSca.Count = dx.vulnCout()
+	genSca.Count = dx.vulnCount()
 	baseUrl := fmt.Sprintf(cfg.VulnMgmtProjectUrlTmpl, vulnMgmtId)
 	genSca.VulnMgmtProjectUrl = baseUrl
 	for _, vuln := range dx.Vulnerabilities {
@@ -100,6 +100,6 @@ func (dx *cycloneDX) ToGenSca(cfg config.ScaParserConfig, vulnMgmtId int) GenSca
 	return genSca
 }
 
-func (dx *cycloneDX) vulnCout() int {
+func (dx *cycloneDX) vulnCount() int {
 	return len(dx.Vulnerabilities)
 }

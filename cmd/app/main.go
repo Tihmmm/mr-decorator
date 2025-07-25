@@ -61,7 +61,7 @@ func init() {
 		rootCmd.Flags().BoolVarP(&promptToken, "prompt-token", "p", false, "Prompt for Gitlab token")
 		rootCmd.MarkFlagsOneRequired("token", "prompt-token")
 		rootCmd.MarkFlagsMutuallyExclusive("token", "prompt-token")
-		rootCmd.Flags().IntVarP(&vulnerabilityMgmtId, "vid", "v", -1, "Some identificator in your vulnerability management system")
+		rootCmd.Flags().IntVarP(&vulnerabilityMgmtId, "vid", "v", -1, "Some identifier in your vulnerability management system")
 		rootCmd.Flags().StringVarP(&path, "file", "f", "", "Path to locally stored report file")
 		rootCmd.Flags().IntVar(&projectId, "project-id", -1, "Gitlab project ID")
 		rootCmd.MarkFlagsOneRequired("file", "project-id")
