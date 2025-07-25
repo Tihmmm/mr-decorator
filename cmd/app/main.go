@@ -33,17 +33,28 @@ var (
 	artifactFileName    string
 	mergeRequestIid     int
 
+	port string
+
 	rootCmd = &cobra.Command{
 		Use:     "",
 		Version: "2.0",
-		Short:   "",
-		Long:    ``,
-		Run:     run,
+		Long: `A merge request decorator for Gitlab. Can be used in either 'cli' or 'server' mode.
+In either mode don't forget to set the following environment variables:
+	SCA_VULN_MGMT_PROJECT_BASE_URL
+	SCA_VULN_MGMT_INSTANCE_SUBPATH_TEMPLATE
+	SCA_VULN_MGMT_REPORT_SUBPATH_TEMPLATE
+	SAST_VULN_MGMT_PROJECT_BASE_URL,unset"          // e.g. https://fortify-ssc.company.com/html/ssc/version/%d
+	SAST_VULN_MGMT_INSTANCE_SUBPATH_TEMPLATE		// e.g. audit?q=instance_id%3A
+	SAST_VULN_MGMT_REPORT_SUBPATH_TEMPLATE			// e.g. audit?q=analysis_type%3Asca
+	GITLAB_IP
+	GITLAB_DOMAIN
+        `,
+		Run: run,
 	}
 )
 
 func init() {
-	rootCmd.Flags().StringVarP(&mode, "mode", "m", "server", "Accepts either `cli` or `server`. Default is `server`")
+	rootCmd.Flags().StringVarP(&mode, "mode", "m", "server", "Accepts either `cli` or `server`")
 	if mode == "cli" {
 		rootCmd.Flags().StringVarP(&authToken, "token", "t", "", "Gitlab auth token with `api` scope")
 		rootCmd.Flags().BoolVarP(&promptToken, "prompt-token", "p", false, "Prompt for Gitlab token")
@@ -59,6 +70,8 @@ func init() {
 		rootCmd.Flags().StringVar(&artifactFileName, "artifact-file", "", "Filename of artifact")
 		rootCmd.Flags().IntVar(&mergeRequestIid, "mr-iid", -1, "Merge request internal ID")
 		rootCmd.MarkFlagsRequiredTogether("project-id", "job-id", "artifact-format", "artifact-file", "mr-iid")
+	} else if mode == "server" {
+		rootCmd.Flags().StringVarP(&port, "port", "p", "-1", "Server port. If not specified, it will use the SERVER_PORT environment variable")
 	}
 }
 
@@ -92,7 +105,7 @@ func run(cmd *cobra.Command, args []string) {
 		}
 	case "server":
 		s := server.NewEchoServer(cfg.Server, v, d)
-		if err := s.Start(); err != nil {
+		if err := s.Start(port); err != nil {
 			log.Fatal(err)
 		}
 	default:

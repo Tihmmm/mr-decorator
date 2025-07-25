@@ -7,13 +7,24 @@ import (
 	"io"
 	"log"
 	"os"
-	"path/filepath"
 )
 
-func ReadCsv(path string) ([][]string, error) {
-	file, err := os.Open(path)
+func ReadCsv(dir, subpath string) ([][]string, error) {
+	root, err := os.OpenRoot(dir)
 	if err != nil {
-		log.Printf("Error opening csv file: %s,", err)
+		log.Printf("Error opening directory root: %s\n", err)
+		return nil, err
+	}
+	defer func(root *os.Root) {
+		if err := root.Close(); err != nil {
+			log.Printf("Error closing root: %s\n", err)
+			return
+		}
+	}(root)
+
+	file, err := root.Open(subpath)
+	if err != nil {
+		log.Printf("Error opening csv file: %s\n", err)
 		return nil, err
 	}
 	defer func(file *os.File) {
@@ -40,10 +51,22 @@ func ReadCsv(path string) ([][]string, error) {
 	return records, nil
 }
 
-func ParseJsonFile(fileDir string, fileName string, dest any) error {
-	jsonFile, err := os.Open(filepath.Join(fileDir, fileName))
+func ParseJsonFile(dir, subpath string, dest any) error {
+	root, err := os.OpenRoot(dir)
 	if err != nil {
-		log.Printf("Error opening jsonFile file: %s, err: %s\n", fileName, err)
+		log.Printf("Error opening directory root: %s\n", err)
+		return err
+	}
+	defer func(root *os.Root) {
+		if err := root.Close(); err != nil {
+			log.Printf("Error closing root: %s\n", err)
+			return
+		}
+	}(root)
+
+	jsonFile, err := root.Open(subpath)
+	if err != nil {
+		log.Printf("Error opening jsonFile file: %s, err: %s\n", subpath, err)
 		return err
 	}
 	defer func(file *os.File) {
@@ -55,7 +78,7 @@ func ParseJsonFile(fileDir string, fileName string, dest any) error {
 
 	jsonParser := json.NewDecoder(jsonFile)
 	if err = jsonParser.Decode(dest); err != nil {
-		log.Printf("Error decoding json file: %s, err: %s\n", fileName, err)
+		log.Printf("Error decoding json file: %s, err: %s\n", subpath, err)
 		return err
 	}
 

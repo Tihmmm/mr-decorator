@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strconv"
 )
 
@@ -34,30 +33,30 @@ type fprRecord struct {
 	sscVulnInstance string
 }
 
-func ParseFprFile(fileDir string, dest *fpr) (err error) {
-	if err := extractVulns(fileDir); err != nil {
+func ParseFprFile(dir string, dest *fpr) (err error) {
+	if err := extractVulns(dir); err != nil {
 		log.Printf("Error parsing fpr: %s\n", err)
 		return err
 	}
 
-	dest.criticalCount, err = extractVulnCount(filepath.Join(fileDir, criticalCountFile))
+	dest.criticalCount, err = extractVulnCount(dir, criticalCountFile)
 	if err != nil {
 		log.Printf("Error parsing critical count: %s\n", err)
 		return err
 	}
-	dest.highCount, err = extractVulnCount(filepath.Join(fileDir, highCountFile))
+	dest.highCount, err = extractVulnCount(dir, highCountFile)
 	if err != nil {
 		log.Printf("Error parsing high count: %s\n", err)
 		return err
 	}
 
-	criticalRecords, err := extractRecords(filepath.Join(fileDir, criticalCsv))
+	criticalRecords, err := extractRecords(dir, criticalCsv)
 	if err != nil {
 		return err
 	}
 	dest.criticalRecords = criticalRecords
 
-	highRecords, err := extractRecords(filepath.Join(fileDir, highCsv))
+	highRecords, err := extractRecords(dir, highCsv)
 	if err != nil {
 		return err
 	}
@@ -76,15 +75,27 @@ func extractVulns(fileDir string) error {
 	return nil
 }
 
-func extractVulnCount(filePath string) (int, error) {
-	vulnCountFile, err := os.Open(filePath)
+func extractVulnCount(dir, subpath string) (int, error) {
+	root, err := os.OpenRoot(dir)
+	if err != nil {
+		log.Printf("Error opening directory root: %s\n", err)
+		return -1, err
+	}
+	defer func(root *os.Root) {
+		if err := root.Close(); err != nil {
+			log.Printf("Error closing root: %s\n", err)
+			return
+		}
+	}(root)
+
+	vulnCountFile, err := root.Open(subpath)
 	if err != nil {
 		log.Printf("Error opening vulns count file: %s\n", err)
 		return -1, err
 	}
 	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
+		if err := file.Close(); err != nil {
+			log.Printf("Error closing file: %s\n", err)
 			return
 		}
 	}(vulnCountFile)
@@ -98,8 +109,8 @@ func extractVulnCount(filePath string) (int, error) {
 	return count, nil
 }
 
-func extractRecords(path string) ([]fprRecord, error) {
-	records, err := file.ReadCsv(path)
+func extractRecords(dir, subpath string) ([]fprRecord, error) {
+	records, err := file.ReadCsv(dir, subpath)
 	if err != nil {
 		log.Printf("Error extracting fpr records")
 		return []fprRecord{}, err

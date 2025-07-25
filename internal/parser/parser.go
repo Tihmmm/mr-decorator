@@ -29,11 +29,11 @@ func NewParser(cfg config.ParserConfig) Parser {
 	return parser
 }
 
-func (p *ArtifactParser) Parse(format string, fileName string, fileDir string, vulnMgmtId int) (string, error) {
+func (p *ArtifactParser) Parse(format string, fileName string, dir string, vulnMgmtId int) (string, error) {
 	switch format {
 	case models.FprFn:
 		var f fpr
-		if err := ParseFprFile(fileDir, &f); err != nil {
+		if err := ParseFprFile(dir, &f); err != nil {
 			return "", err
 		}
 		sast := f.ToGenSast(p.cfg.SastParserConfig, vulnMgmtId)
@@ -45,7 +45,7 @@ func (p *ArtifactParser) Parse(format string, fileName string, fileDir string, v
 		return note, nil
 	case models.CyclonedxJsonFn:
 		var dx cycloneDX
-		if err := file.ParseJsonFile(fileDir, fileName, &dx); err != nil {
+		if err := file.ParseJsonFile(dir, fileName, &dx); err != nil {
 			return "", err
 		}
 		sca := dx.ToGenSca(p.cfg.ScaParserConfig, vulnMgmtId)
@@ -57,7 +57,7 @@ func (p *ArtifactParser) Parse(format string, fileName string, fileDir string, v
 		return note, nil
 	case models.DependencyCheckJsonFn:
 		var dc dependencyCheck
-		if err := file.ParseJsonFile(fileDir, fileName, &dc); err != nil {
+		if err := file.ParseJsonFile(dir, fileName, &dc); err != nil {
 			return "", err
 		}
 		sca := dc.ToGenSca(p.cfg.ScaParserConfig, vulnMgmtId)

@@ -13,7 +13,7 @@ import (
 )
 
 type Server interface {
-	Start() error
+	Start(port string) error
 	Liveliness(ctx echo.Context) error
 	DecorateMergeRequest(ctx echo.Context) error
 }
@@ -36,9 +36,9 @@ func NewEchoServer(cfg config.ServerConfig, v validator.Validator, d decorator.D
 	return server
 }
 
-func (s *EchoServer) Start() error {
+func (s *EchoServer) Start(port string) error {
 	s.e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(3)))
-	if err := s.e.Start(s.cfg.Port); err != nil && !errors.Is(http.ErrServerClosed, err) {
+	if err := s.e.Start(port); err != nil && !errors.Is(http.ErrServerClosed, err) {
 		log.Fatalf("Server shutdown occured: %s", err)
 		return err
 	}
