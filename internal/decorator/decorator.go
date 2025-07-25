@@ -52,7 +52,7 @@ func (d *MRDecorator) DecorateServer(mrRequest *models.MRRequest) error {
 		return err
 	}
 
-	log.Printf("%s Finished processing request: %v\n", time.Now().Format(time.DateTime), mrRequest)
+	log.Printf("%s Finished processing request for project: %d, merge request id: %d, job id: %d\n", time.Now().Format(time.DateTime), mrRequest.ProjectId, mrRequest.MergeRequestIid, mrRequest.JobId)
 
 	return nil
 }
@@ -81,7 +81,7 @@ func (d *MRDecorator) DecorateCli(mrRequest *models.MRRequest) error {
 		return err
 	}
 
-	log.Printf("%s Finished processing request: %v\n", time.Now().Format(time.DateTime), mrRequest)
+	log.Printf("%s Finished processing request for project: %d, merge request id: %d, job id: %d\n", time.Now().Format(time.DateTime), mrRequest.ProjectId, mrRequest.MergeRequestIid, mrRequest.JobId)
 
 	return nil
 }
