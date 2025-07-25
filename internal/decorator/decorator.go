@@ -38,17 +38,20 @@ func (d *MRDecorator) DecorateServer(mrRequest *models.MRRequest) error {
 
 	artifactsDir, err := d.c.GetArtifact(mrRequest.ProjectId, mrRequest.JobId, mrRequest.ArtifactFileName, mrRequest.AuthToken)
 	if err != nil {
+		log.Printf("Error getting artifact: %v\n", err)
 		return err
 	}
 	defer file.DeleteDirectory(artifactsDir)
 
 	note, err := d.p.Parse(mrRequest.ArtifactFormat, mrRequest.ArtifactFileName, artifactsDir, mrRequest.VulnerabilityMgmtId)
 	if err != nil {
+		log.Printf("Error parsing artifact for mr iid: '%d' in project %s: %v\n", mrRequest.MergeRequestIid, mrRequest.ProjectId, err)
 		return err
 	}
 
 	err = d.c.SendNote(note, mrRequest.ProjectId, mrRequest.MergeRequestIid, mrRequest.AuthToken)
 	if err != nil {
+		log.Printf("Error sending note for mr iid: '%d' in project %s: %v\n", mrRequest.MergeRequestIid, mrRequest.ProjectId, err)
 		return err
 	}
 
@@ -64,6 +67,7 @@ func (d *MRDecorator) DecorateCli(mrRequest *models.MRRequest) error {
 	if mrRequest.FilePath == "" {
 		artifactsDir, err := d.c.GetArtifact(mrRequest.ProjectId, mrRequest.JobId, mrRequest.ArtifactFileName, mrRequest.AuthToken)
 		if err != nil {
+			log.Printf("Error getting artifact: %v\n", err)
 			return err
 		}
 		defer file.DeleteDirectory(artifactsDir)
@@ -73,11 +77,13 @@ func (d *MRDecorator) DecorateCli(mrRequest *models.MRRequest) error {
 
 	note, err := d.p.Parse(mrRequest.ArtifactFormat, mrRequest.ArtifactFileName, artifactsDir, mrRequest.VulnerabilityMgmtId)
 	if err != nil {
+		log.Printf("Error parsing artifact '%s': %v\n", mrRequest.ArtifactFileName, err)
 		return err
 	}
 
 	err = d.c.SendNote(note, mrRequest.ProjectId, mrRequest.MergeRequestIid, mrRequest.AuthToken)
 	if err != nil {
+		log.Printf("Error processing artifact '%s': %v\n", mrRequest.ArtifactFileName, err)
 		return err
 	}
 

@@ -39,7 +39,7 @@ type SastParserConfig struct {
 func NewConfig() Config {
 	cfg := Config{}
 	if err := env.Parse(&cfg); err != nil {
-		log.Printf("Error initializing config: %s", err)
+		log.Fatalf("Error initializing config: %s\n", err)
 	}
 
 	return cfg

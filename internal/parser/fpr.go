@@ -84,12 +84,14 @@ func ParseFprFile(dir string, dest *fpr) (err error) {
 
 	criticalRecords, err := extractRecords(dir, criticalCsv)
 	if err != nil {
+		log.Printf("Error parsing critical records: %s\n", err)
 		return err
 	}
 	dest.criticalRecords = criticalRecords
 
 	highRecords, err := extractRecords(dir, highCsv)
 	if err != nil {
+		log.Printf("Error parsing high records: %s\n", err)
 		return err
 	}
 	dest.highRecords = highRecords
@@ -99,9 +101,11 @@ func ParseFprFile(dir string, dest *fpr) (err error) {
 
 func extractVulns(fileDir string) error {
 	if err := exec.Command(fpruCritScriptPath, fileDir).Run(); err != nil {
+		log.Printf("Error extracting critical vulns: %s\n", err)
 		return err
 	}
 	if err := exec.Command(fpruHighScriptPath, fileDir).Run(); err != nil {
+		log.Printf("Error extracting high vulns: %s\n", err)
 		return err
 	}
 	return nil

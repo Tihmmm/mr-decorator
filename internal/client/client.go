@@ -64,6 +64,7 @@ func (c *HttpClient) GetArtifact(projectId int, jobId int, artifactFileName stri
 	defer func(body io.ReadCloser) {
 		err := body.Close()
 		if err != nil {
+			log.Printf("Error closing response body for project: %d, job: %d, err: %s\n", projectId, jobId, err)
 			return
 		}
 	}(resp.Body)
@@ -71,6 +72,7 @@ func (c *HttpClient) GetArtifact(projectId int, jobId int, artifactFileName stri
 	dirPath := filepath.Join(artifactsBaseDir, uuid.New().String())
 	if err := os.MkdirAll(dirPath, 0750); err != nil {
 		log.Printf("Error creating artifact directory: %s\n", err)
+		return "", err
 	}
 	filePath := filepath.Join(dirPath, artifactFileName)
 	out, err := os.Create(filePath)
@@ -93,6 +95,7 @@ func (c *HttpClient) SendNote(note string, projectId int, mergeRequestIid int, g
 	bodyBytes, err := json.Marshal(body)
 	if err != nil {
 		log.Printf("Error parsing body: %s\n", err)
+		return err
 	}
 
 	notePath := fmt.Sprintf(mergeRequestNotesEndpointBasePath, projectId, mergeRequestIid)
@@ -110,6 +113,7 @@ func (c *HttpClient) SendNote(note string, projectId int, mergeRequestIid int, g
 	defer func(body io.ReadCloser) {
 		err := body.Close()
 		if err != nil {
+			log.Printf("Error closing response body for job artifact '%s': %v\n", notePath, err)
 			return
 		}
 	}(resp.Body)
@@ -119,6 +123,7 @@ func (c *HttpClient) SendNote(note string, projectId int, mergeRequestIid int, g
 
 	if resp.StatusCode != http.StatusCreated {
 		log.Printf("Error sending note. Gitlab response status code: %d\nbody: %s\n", resp.StatusCode, string(respBuf))
+		return
 	}
 	return nil
 }
@@ -127,6 +132,7 @@ func newBaseGetRequest(path string, glToken string, host string) (*http.Request,
 	fullLink := "https://" + host + path
 	req, err := http.NewRequest(http.MethodGet, fullLink, nil)
 	if err != nil {
+		log.Printf("Error creating GET request for job artifact '%s': %s\n", path, err)
 		return nil, err
 	}
 	req.Header.Set(privateTokenHeader, glToken)
@@ -138,6 +144,7 @@ func newBasePostRequest(path string, body io.Reader, glToken string, host string
 	fullLink := "https://" + host + path
 	req, err := http.NewRequest(http.MethodPost, fullLink, body)
 	if err != nil {
+		log.Printf("Error creating POST request for job artifact '%s': %s\n", path, err)
 		return nil, err
 	}
 	req.Header.Set(privateTokenHeader, glToken)

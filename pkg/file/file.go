@@ -30,6 +30,7 @@ func ReadCsv(dir, subpath string) ([][]string, error) {
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
+			log.Printf("Error closing file: %s\n", err)
 			return
 		}
 	}(file)
@@ -72,6 +73,7 @@ func ParseJsonFile(dir, subpath string, dest any) error {
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
+			log.Printf("Error closing file: %s\n", err)
 			return
 		}
 	}(jsonFile)
@@ -88,6 +90,7 @@ func ParseJsonFile(dir, subpath string, dest any) error {
 func DeleteDirectory(dir string) {
 	err := os.RemoveAll(dir)
 	if err != nil {
+		log.Printf("Error deleting directory %s: %s\n", dir, err)
 		return
 	}
 }

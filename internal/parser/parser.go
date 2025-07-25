@@ -40,6 +40,7 @@ func (p *ArtifactParser) Parse(format string, fileName string, dir string, vulnM
 		sast.ApplyLimit()
 		note, err := templater.ExecToString(baseTemplateSast, &sast)
 		if err != nil {
+			log.Printf("Error executing sast template: %s\n", err)
 			return "", err
 		}
 		return note, nil
@@ -52,6 +53,7 @@ func (p *ArtifactParser) Parse(format string, fileName string, dir string, vulnM
 		sca.ApplyLimit()
 		note, err := templater.ExecToString(baseTemplateSca, &sca)
 		if err != nil {
+			log.Printf("Error executing cdx template: %s\n", err)
 			return "", err
 		}
 		return note, nil
@@ -64,6 +66,7 @@ func (p *ArtifactParser) Parse(format string, fileName string, dir string, vulnM
 		sca.ApplyLimit()
 		note, err := templater.ExecToString(baseTemplateSca, &sca)
 		if err != nil {
+			log.Printf("Error executing depcheck template: %s\n", err)
 			return "", err
 		}
 		return note, nil
