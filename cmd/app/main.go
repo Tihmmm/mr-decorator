@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/Tihmmm/mr-decorator/internal/client"
-	"github.com/Tihmmm/mr-decorator/internal/config"
-	"github.com/Tihmmm/mr-decorator/internal/decorator"
-	"github.com/Tihmmm/mr-decorator/internal/models"
-	"github.com/Tihmmm/mr-decorator/internal/parser"
+	"github.com/Tihmmm/mr-decorator-core/client"
+	"github.com/Tihmmm/mr-decorator-core/config"
+	"github.com/Tihmmm/mr-decorator-core/decorator"
+	"github.com/Tihmmm/mr-decorator-core/models"
+	"github.com/Tihmmm/mr-decorator-core/parser"
+	"github.com/Tihmmm/mr-decorator-core/validator"
 	"github.com/Tihmmm/mr-decorator/internal/server"
-	"github.com/Tihmmm/mr-decorator/internal/validator"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh/terminal"
 	"log"

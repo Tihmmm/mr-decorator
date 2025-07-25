@@ -2,10 +2,10 @@ package server
 
 import (
 	"errors"
-	"github.com/Tihmmm/mr-decorator/internal/config"
-	"github.com/Tihmmm/mr-decorator/internal/decorator"
-	"github.com/Tihmmm/mr-decorator/internal/models"
-	"github.com/Tihmmm/mr-decorator/internal/validator"
+	"github.com/Tihmmm/mr-decorator-core/config"
+	"github.com/Tihmmm/mr-decorator-core/decorator"
+	"github.com/Tihmmm/mr-decorator-core/models"
+	"github.com/Tihmmm/mr-decorator-core/validator"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"log"
@@ -51,7 +51,7 @@ func (s *EchoServer) registerRoutes() {
 }
 
 func (s *EchoServer) Liveliness(ctx echo.Context) error {
-	return ctx.JSON(http.StatusOK, models.Health{Status: http.StatusText(http.StatusOK)})
+	return ctx.String(http.StatusOK, "I am alive!")
 }
 
 func (s *EchoServer) DecorateMergeRequest(ctx echo.Context) error {
@@ -59,7 +59,7 @@ func (s *EchoServer) DecorateMergeRequest(ctx echo.Context) error {
 	err := ctx.Bind(&mrRequest)
 	if err != nil {
 		log.Printf("Error binding request: %s", err)
-		return ctx.JSON(http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
+		return ctx.String(http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
 	}
 	if !s.v.IsValidAll(mrRequest) {
 		return ctx.JSON(http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
@@ -67,5 +67,5 @@ func (s *EchoServer) DecorateMergeRequest(ctx echo.Context) error {
 
 	go s.d.DecorateServer(mrRequest)
 
-	return ctx.JSON(http.StatusAccepted, http.StatusText(http.StatusAccepted))
+	return ctx.String(http.StatusAccepted, http.StatusText(http.StatusAccepted))
 }
