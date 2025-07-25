@@ -33,6 +33,38 @@ type fprRecord struct {
 	sscVulnInstance string
 }
 
+func (f *fpr) ToGenSast(cfg config.SastParserConfig, vulnMgmtId int) GenSast {
+	var genSast GenSast
+	genSast.HcCount = f.vulnCount()
+	genSast.HighCount = f.highCount
+	genSast.CriticalCount = f.criticalCount
+	baseUrl := fmt.Sprintf(cfg.VulnMgmtProjectUrlTmpl, vulnMgmtId)
+	genSast.VulnMgmtProjectUrl = baseUrl
+	for _, v := range f.highRecords {
+		highVulns := Vulnerability{
+			Name:             v.category,
+			Location:         v.path,
+			VulnMgmtInstance: baseUrl + fmt.Sprintf(cfg.VulnInstanceTmpl, v.sscVulnInstance),
+		}
+		genSast.HighVulns = append(genSast.HighVulns, highVulns)
+	}
+	for _, v := range f.criticalRecords {
+		criticalVulns := Vulnerability{
+			Name:             v.category,
+			Location:         v.path,
+			VulnMgmtInstance: baseUrl + fmt.Sprintf(cfg.VulnInstanceTmpl, v.sscVulnInstance),
+		}
+		genSast.CriticalVulns = append(genSast.CriticalVulns, criticalVulns)
+	}
+	genSast.VulnMgmtReportPath = baseUrl + cfg.ReportPath
+
+	return genSast
+}
+
+func (f *fpr) vulnCount() int {
+	return f.criticalCount + f.highCount
+}
+
 func ParseFprFile(dir string, dest *fpr) (err error) {
 	if err := extractVulns(dir); err != nil {
 		log.Printf("Error parsing fpr: %s\n", err)
@@ -126,36 +158,4 @@ func extractRecords(dir, subpath string) ([]fprRecord, error) {
 	}
 
 	return fprRecords, nil
-}
-
-func (f *fpr) ToGenSast(cfg config.SastParserConfig, vulnMgmtId int) GenSast {
-	var genSast GenSast
-	genSast.HcCount = f.vulnCount()
-	genSast.HighCount = f.highCount
-	genSast.CriticalCount = f.criticalCount
-	baseUrl := fmt.Sprintf(cfg.VulnMgmtProjectUrlTmpl, vulnMgmtId)
-	genSast.VulnMgmtProjectUrl = baseUrl
-	for _, v := range f.highRecords {
-		highVulns := Vulnerability{
-			Name:             v.category,
-			Location:         v.path,
-			VulnMgmtInstance: baseUrl + fmt.Sprintf(cfg.VulnInstanceTmpl, v.sscVulnInstance),
-		}
-		genSast.HighVulns = append(genSast.HighVulns, highVulns)
-	}
-	for _, v := range f.criticalRecords {
-		criticalVulns := Vulnerability{
-			Name:             v.category,
-			Location:         v.path,
-			VulnMgmtInstance: baseUrl + fmt.Sprintf(cfg.VulnInstanceTmpl, v.sscVulnInstance),
-		}
-		genSast.CriticalVulns = append(genSast.CriticalVulns, criticalVulns)
-	}
-	genSast.VulnMgmtReportPath = baseUrl + cfg.ReportPath
-
-	return genSast
-}
-
-func (f *fpr) vulnCount() int {
-	return f.criticalCount + f.highCount
 }

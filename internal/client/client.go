@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	cfg "github.com/Tihmmm/mr-decorator/internal/config"
 	"github.com/Tihmmm/mr-decorator/internal/errors"
@@ -86,11 +87,17 @@ func (c *HttpClient) GetArtifact(projectId int, jobId int, artifactFileName stri
 }
 
 func (c *HttpClient) SendNote(note string, projectId int, mergeRequestIid int, glToken string) (err error) {
-	bodyStr := []byte(fmt.Sprintf(`{"body":"%s"}`, note))
-	body := bytes.NewBuffer(bodyStr)
+	body := struct {
+		Body string `json:"body"`
+	}{note}
+	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		log.Printf("Error parsing body: %s\n", err)
+	}
+
 	notePath := fmt.Sprintf(mergeRequestNotesEndpointBasePath, projectId, mergeRequestIid)
 
-	req, err := newBasePostRequest(notePath, body, glToken, c.cfg.Host)
+	req, err := newBasePostRequest(notePath, bytes.NewBuffer(bodyBytes), glToken, c.cfg.Host)
 	if err != nil {
 		log.Printf("Error creating POST request to send node for job artifact '%s': %v\n", notePath, err)
 		return err

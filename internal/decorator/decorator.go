@@ -58,7 +58,7 @@ func (d *MRDecorator) DecorateServer(mrRequest *models.MRRequest) error {
 }
 
 func (d *MRDecorator) DecorateCli(mrRequest *models.MRRequest) error {
-	log.Printf("%s Started processing request: %v\n", time.Now().Format(time.DateTime), mrRequest)
+	log.Printf("%s Started processing request for project: %d, merge request id: %d, job id: %d\n", time.Now().Format(time.DateTime), mrRequest.ProjectId, mrRequest.MergeRequestIid, mrRequest.JobId)
 	artifactsDir := ""
 
 	if mrRequest.FilePath == "" {
