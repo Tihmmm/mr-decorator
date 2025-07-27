@@ -3,10 +3,12 @@ module github.com/Tihmmm/mr-decorator
 go 1.24.5
 
 require (
-	github.com/Tihmmm/mr-decorator-core v0.1.6
+	github.com/Tihmmm/mr-decorator-core v0.1.7
+	github.com/alexedwards/argon2id v1.0.0
 	github.com/labstack/echo/v4 v4.13.4
 	github.com/spf13/cobra v1.9.1
 	golang.org/x/crypto v0.40.0
+	golang.org/x/time v0.12.0
 )
 
 require (
@@ -31,5 +33,4 @@ require (
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/term v0.33.0 // indirect
 	golang.org/x/text v0.27.0 // indirect
-	golang.org/x/time v0.12.0 // indirect
 )

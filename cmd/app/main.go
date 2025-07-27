@@ -17,6 +17,7 @@ func main() {
 		log.Println(err)
 		os.Exit(1)
 	}
+
 }
 
 var (
@@ -28,14 +29,17 @@ var (
 		Long: `A merge request decorator for Gitlab. Can be used in either 'cli' or 'server' mode.
 In either mode don't forget to fill the configuration file.
 It should be noted that any cli argument will be overwritten by values from configuration file if filled.
-        `,
+       `,
 	}
 )
 
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "config.yml", "path to configuration file")
 
-	cfg := config.NewConfig(configPath)
+	cfg, err := config.NewConfig(configPath)
+	if err != nil {
+		log.Fatal(err)
+	}
 	c := client.NewGitlabClient(cfg.GitlabClient)
 	v := validator.NewValidator()
 	cmdOpts := &opts.CmdOpts{
@@ -57,7 +61,7 @@ func completionCommand() *cobra.Command {
 		Use:   "completion",
 		Short: "no",
 		Run: func(cmd *cobra.Command, args []string) {
-			log.Fatal("not implemented")
+			log.Fatal("this command will not be implemented.")
 		},
 	}
 }

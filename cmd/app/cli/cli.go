@@ -5,8 +5,8 @@ import (
 	"github.com/Tihmmm/mr-decorator-core/models"
 	"github.com/Tihmmm/mr-decorator-core/parser"
 	"github.com/Tihmmm/mr-decorator/cmd/opts"
+	"github.com/Tihmmm/mr-decorator/pkg"
 	"github.com/spf13/cobra"
-	"golang.org/x/crypto/ssh/terminal"
 	"log"
 )
 
@@ -35,18 +35,15 @@ func NewCmd(opts *opts.CmdOpts) *cobra.Command {
 			MergeRequestIid:     mergeRequestIid,
 			VulnerabilityMgmtId: vulnerabilityMgmtId,
 		}
+		if promptToken {
+			if err := pkg.ReadSecretStdinToString(&mr.AuthToken); err != nil {
+				log.Fatalln(err)
+			}
+		}
 
 		if !opts.V.IsValidAll(mr) {
 			log.Fatal("Input parameters invalid")
 		}
-		if promptToken {
-			tokenBytes, err := terminal.ReadPassword(0)
-			if err != nil {
-				log.Fatal(err)
-			}
-			authToken = string(tokenBytes)
-		}
-		mr.AuthToken = authToken
 		prsr, err := parser.Get(mr.ArtifactFormat)
 		if err != nil {
 			log.Fatalf("Error getting parser for format `%s`: %s", mr.ArtifactFormat, err)

@@ -9,6 +9,7 @@ import (
 	"github.com/Tihmmm/mr-decorator-core/models"
 	"github.com/Tihmmm/mr-decorator-core/parser"
 	"github.com/Tihmmm/mr-decorator-core/validator"
+	"github.com/Tihmmm/mr-decorator/pkg"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/time/rate"
@@ -30,6 +31,14 @@ type EchoServer struct {
 }
 
 func NewEchoServer(cfg config.ServerConfig, v validator.Validator, d decorator.Decorator) Server {
+	if cfg.ApiKey != "" {
+		apiKeyHash, err := pkg.GetArgonHash(cfg.ApiKey, nil)
+		if err != nil {
+			log.Fatalf("Error getting argon2 hash: %v\n", err)
+		}
+		cfg.ApiKey = apiKeyHash
+	}
+
 	server := &EchoServer{
 		cfg: cfg,
 		e:   echo.New(),
@@ -61,6 +70,11 @@ func (s *EchoServer) Liveliness(ctx echo.Context) error {
 }
 
 func (s *EchoServer) DecorateMergeRequest(ctx echo.Context) error {
+	apiKey := ctx.Request().Header.Get("Api-Key")
+	if s.cfg.ApiKey != "" && !pkg.CheckArgonHash(apiKey, s.cfg.ApiKey) {
+		return ctx.String(http.StatusUnauthorized, "API Key is invalid")
+	}
+
 	mr := new(models.MRRequest)
 	err := ctx.Bind(&mr)
 	if err != nil {
