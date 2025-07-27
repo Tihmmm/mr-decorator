@@ -22,6 +22,7 @@ func main() {
 }
 
 var (
+	configFilePath      string
 	mode                string // either `cli` or `server`
 	authToken           string
 	promptToken         bool
@@ -54,6 +55,7 @@ In either mode don't forget to set the following environment variables:
 )
 
 func init() {
+	rootCmd.PersistentFlags().StringVarP(&configFilePath, "config", "c", "config.yml", "path to configuration file")
 	rootCmd.Flags().StringVarP(&mode, "mode", "m", "server", "Accepts either `cli` or `server`")
 	switch mode {
 	case "cli":
@@ -79,9 +81,9 @@ func init() {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	cfg := config.NewConfig()
+	cfg := config.NewConfig(configFilePath)
 	v := validator.NewValidator()
-	c := client.NewHttpClient(cfg.HttpClient)
+	c := client.NewHttpClient(cfg.GitlabClient)
 	p := parser.NewParser(cfg.Parser)
 	d := decorator.NewDecorator(mode, c, p)
 	switch mode {

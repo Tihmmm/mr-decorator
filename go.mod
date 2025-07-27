@@ -3,20 +3,20 @@ module github.com/Tihmmm/mr-decorator
 go 1.24.5
 
 require (
-	github.com/Tihmmm/mr-decorator-core v0.1.1
+	github.com/Tihmmm/mr-decorator-core v0.1.2
 	github.com/labstack/echo/v4 v4.13.4
 	github.com/spf13/cobra v1.9.1
 	golang.org/x/crypto v0.40.0
 )
 
 require (
-	github.com/caarlos0/env/v10 v10.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/doyensec/safeurl v0.2.2 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.27.0 // indirect
+	github.com/goccy/go-yaml v1.18.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
@@ -31,5 +31,5 @@ require (
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/term v0.33.0 // indirect
 	golang.org/x/text v0.27.0 // indirect
-	golang.org/x/time v0.11.0 // indirect
+	golang.org/x/time v0.12.0 // indirect
 )

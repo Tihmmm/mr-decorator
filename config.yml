@@ -1,0 +1,14 @@
+server:
+  port: 3000
+gitlab_client:
+  ip: 0.0.0.0
+  host: gitlab.example.com
+parser:
+  sca:
+    vuln_mgmt_project_url_tmpl: https://vuln-mgmt.example.com/project/%s/
+    vuln_instance_tmpl: example
+    report_path: project-1/report
+  sast:
+    vuln_mgmt_project_url_tmpl: https://fortify-ssc.example.com/html/ssc/version/%d
+    vuln_instance_tmpl: audit?q=instance_id%3A
+    report_path: audit?q=analysis_type%3Asca
