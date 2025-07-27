@@ -14,7 +14,7 @@ var (
 )
 
 func NewCmd(opts *opts.CmdOpts) *cobra.Command {
-	d := decorator.NewDecorator(decorator.ModeServer, opts.C)
+	d := decorator.NewDecorator(decorator.ModeServer, opts.Cfg.Decorator, opts.C)
 	cmd := &cobra.Command{
 		Use:   "server",
 		Short: "Launches decorator in cli mode",

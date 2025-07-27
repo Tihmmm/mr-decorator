@@ -23,7 +23,7 @@ var (
 )
 
 func NewCmd(opts *opts.CmdOpts) *cobra.Command {
-	d := decorator.NewDecorator(decorator.ModeCli, opts.C)
+	d := decorator.NewDecorator(decorator.ModeCli, opts.Cfg.Decorator, opts.C)
 
 	run := func(cmd *cobra.Command, args []string) {
 		mr := &models.MRRequest{
