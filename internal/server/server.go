@@ -11,6 +11,7 @@ import (
 	"github.com/Tihmmm/mr-decorator-core/validator"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"golang.org/x/time/rate"
 	"log"
 	"net/http"
 )
@@ -40,7 +41,9 @@ func NewEchoServer(cfg config.ServerConfig, v validator.Validator, d decorator.D
 }
 
 func (s *EchoServer) Start(port string) error {
-	s.e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(3)))
+	if s.cfg.RateLimit > 0 {
+		s.e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(s.cfg.RateLimit))))
+	}
 	if err := s.e.Start(port); err != nil && !errors.Is(http.ErrServerClosed, err) {
 		log.Fatalf("Server shutdown occured: %s", err)
 		return err
