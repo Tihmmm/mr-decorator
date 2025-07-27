@@ -22,7 +22,7 @@ func main() {
 }
 
 var (
-	configFilePath      string
+	configPath          string
 	mode                string // either `cli` or `server`
 	authToken           string
 	promptToken         bool
@@ -55,7 +55,7 @@ In either mode don't forget to set the following environment variables:
 )
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&configFilePath, "config", "c", "config.yml", "path to configuration file")
+	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "config.yml", "path to configuration file")
 	rootCmd.Flags().StringVarP(&mode, "mode", "m", "server", "Accepts either `cli` or `server`")
 	switch mode {
 	case "cli":
@@ -81,11 +81,10 @@ func init() {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	cfg := config.NewConfig(configFilePath)
+	cfg := config.NewConfig(configPath)
+	c := client.NewGitlabClient(cfg.GitlabClient)
 	v := validator.NewValidator()
-	c := client.NewHttpClient(cfg.GitlabClient)
-	p := parser.NewParser(cfg.Parser)
-	d := decorator.NewDecorator(mode, c, p)
+	d := decorator.NewDecorator(mode, c)
 	switch mode {
 	case "cli":
 		mr := &models.MRRequest{
@@ -98,7 +97,7 @@ func run(cmd *cobra.Command, args []string) {
 			VulnerabilityMgmtId: vulnerabilityMgmtId,
 		}
 		if !v.IsValidAll(mr) {
-			os.Exit(127)
+			log.Fatal("Input parameters invalid")
 		}
 		if promptToken {
 			tokenBytes, err := terminal.ReadPassword(0)
@@ -108,13 +107,23 @@ func run(cmd *cobra.Command, args []string) {
 			authToken = string(tokenBytes)
 		}
 		mr.AuthToken = authToken
-		if err := d.DecorateCli(mr); err != nil {
-			log.Fatal(err)
+		prsr, err := parser.Get(mr.ArtifactFormat)
+		if err != nil {
+			log.Fatalf("Error getting parser for format `%s`: %s", mr.ArtifactFormat, err)
+		}
+		prsr.SetConfig(&cfg.Parser)
+		if err := d.Decorate(mr, prsr); err != nil {
+			log.Fatalf("Error decorating: %s", err)
 		}
 	case "server":
+		prsrs := parser.List()
+		for _, k := range prsrs {
+			prsr, _ := parser.Get(k)
+			prsr.SetConfig(&cfg.Parser)
+		}
 		s := server.NewEchoServer(cfg.Server, v, d)
 		if err := s.Start(port); err != nil {
-			log.Fatal(err)
+			log.Fatalf("Error starting server: %s", err)
 		}
 	}
 }

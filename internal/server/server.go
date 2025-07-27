@@ -2,9 +2,12 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"github.com/Tihmmm/mr-decorator-core/config"
 	"github.com/Tihmmm/mr-decorator-core/decorator"
+	custErrors "github.com/Tihmmm/mr-decorator-core/errors"
 	"github.com/Tihmmm/mr-decorator-core/models"
+	"github.com/Tihmmm/mr-decorator-core/parser"
 	"github.com/Tihmmm/mr-decorator-core/validator"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -55,17 +58,27 @@ func (s *EchoServer) Liveliness(ctx echo.Context) error {
 }
 
 func (s *EchoServer) DecorateMergeRequest(ctx echo.Context) error {
-	mrRequest := new(models.MRRequest)
-	err := ctx.Bind(&mrRequest)
+	mr := new(models.MRRequest)
+	err := ctx.Bind(&mr)
 	if err != nil {
 		log.Printf("Error binding request: %s", err)
 		return ctx.String(http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
 	}
-	if !s.v.IsValidAll(mrRequest) {
+	if !s.v.IsValidAll(mr) {
 		return ctx.JSON(http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
 	}
 
-	go s.d.DecorateServer(mrRequest)
+	prsr, err := parser.Get(mr.ArtifactFormat)
+	if err != nil {
+		if errors.Is(err, &custErrors.FormatError{}) {
+			return ctx.String(http.StatusBadRequest, fmt.Sprintf("Parser for format `%s` is not supported or registered", mr.ArtifactFormat))
+		} else {
+			log.Printf("Error getting parser for format %s: %s", mr.ArtifactFormat, err)
+			return ctx.String(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+		}
+	}
+
+	go s.d.Decorate(mr, prsr)
 
 	return ctx.String(http.StatusAccepted, http.StatusText(http.StatusAccepted))
 }
