@@ -38,4 +38,5 @@ func NewCmd(opts *opts.CmdOpts) *cobra.Command {
 
 func initArgs(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&port, "port", "p", "-1", "Server port. If not specified, it will use the SERVER_PORT environment variable")
+	cmd.MarkFlagRequired("port")
 }
