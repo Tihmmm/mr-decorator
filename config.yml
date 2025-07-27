@@ -1,5 +1,9 @@
+decorator:
+  artifact_download_max_retries: 3
+  artifact_download_retry_delay: 2
 server:
   port: 3000
+  rate_limit: 3
 gitlab_client:
   ip: 0.0.0.0
   host: gitlab.example.com
