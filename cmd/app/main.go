@@ -1,21 +1,67 @@
 package main
 
 import (
-	"github.com/Tihmmm/mr-decorator/internal/client"
-	"github.com/Tihmmm/mr-decorator/internal/config"
-	"github.com/Tihmmm/mr-decorator/internal/parser"
-	"github.com/Tihmmm/mr-decorator/internal/server"
-	"github.com/Tihmmm/mr-decorator/internal/validator"
+	"github.com/Tihmmm/mr-decorator-core/client"
+	"github.com/Tihmmm/mr-decorator-core/config"
+	"github.com/Tihmmm/mr-decorator-core/validator"
+	"github.com/Tihmmm/mr-decorator/cmd/app/cli"
+	"github.com/Tihmmm/mr-decorator/cmd/app/server"
+	"github.com/Tihmmm/mr-decorator/cmd/opts"
+	"github.com/spf13/cobra"
 	"log"
+	"os"
 )
 
 func main() {
-	cfg := config.NewConfig()
-	v := validator.NewValidator()
-	c := client.NewHttpClient(cfg.HttpClient)
-	p := parser.NewParser(cfg.Parser)
-	s := server.NewEchoServer(cfg.Server, v, c, p)
-	if err := s.Start(); err != nil {
+	if err := rootCmd.Execute(); err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+
+}
+
+var (
+	configPath string
+
+	rootCmd = &cobra.Command{
+		Use:     "",
+		Version: "0.1.5",
+		Long: `A merge request decorator for Gitlab. Can be used in either 'cli' or 'server' mode.
+In either mode don't forget to fill the configuration file.
+It should be noted that any cli argument will be overwritten by values from configuration file if filled.
+       `,
+	}
+)
+
+func init() {
+	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "config.yml", "path to configuration file")
+
+	cfg, err := config.NewConfig(configPath)
+	if err != nil {
 		log.Fatal(err)
+	}
+	c := client.NewGitlabClient(cfg.GitlabClient)
+	v := validator.NewValidator()
+	cmdOpts := &opts.CmdOpts{
+		Cfg: &cfg,
+		C:   c,
+		V:   v,
+	}
+
+	rootCmd.AddCommand(cli.NewCmd(cmdOpts))
+	rootCmd.AddCommand(server.NewCmd(cmdOpts))
+
+	completion := completionCommand()
+	completion.Hidden = true
+	rootCmd.AddCommand(completion)
+}
+
+func completionCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:   "completion",
+		Short: "no",
+		Run: func(cmd *cobra.Command, args []string) {
+			log.Fatal("this command will not be implemented.")
+		},
 	}
 }

@@ -1,5 +1,4 @@
-FROM golang:1.22.0-alpine3.19 as dependencies
-
+FROM golang:1.24.5-alpine3.22 AS dependencies
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
@@ -8,9 +7,13 @@ FROM dependencies AS build
 COPY . ./
 RUN CGO_ENABLED=0 go build -o /main -ldflags="-w -s" ./cmd/app/
 
-FROM tihmmm/golang-alpine-rootless:go-1.22.0-alp-3.19
-COPY --chown=user:user --chmod=550 --from=build /main /home/user/main
-WORKDIR /home/user/
+FROM golang:1.24.5-alpine3.22
+
+RUN addgroup -S app && adduser -SD app -G app
+USER app
+
+COPY --chown=app:app --chmod=550 --from=build /main /home/app/main
+WORKDIR /home/app/
 COPY --chown=user:user ./FPRU_crit.sh ./FPRU_crit.sh
 COPY --chown=user:user ./FPRU_high.sh ./FPRU_high.sh
 CMD ["./main"]

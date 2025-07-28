@@ -1,5 +1,4 @@
-FROM golang:1.22.0-alpine3.19 as dependencies
-
+FROM golang:1.24.5-alpine3.22 AS dependencies
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
@@ -10,11 +9,15 @@ RUN CGO_ENABLED=0 go build -o /main -ldflags="-w -s" ./cmd/app/
 WORKDIR /go/src/
 RUN go install github.com/go-delve/delve/cmd/dlv@master
 
-FROM tihmmm/golang-alpine-rootless:go-1.22.0-alp-3.19
-COPY --chown=user:user --chmod=550 --from=build /main /home/user/main
-COPY --chown=user:user --chmod=550 --from=build /go/bin/dlv /home/user/dlv
-WORKDIR /home/user/
+FROM golang:1.24.5-alpine3.22
+
+RUN addgroup -S app && adduser -SD app -G app
+USER app
+
+COPY --chown=app:app --chmod=550 --from=build /main /home/app/main
+COPY --chown=app:app --chmod=550 --from=build /go/bin/dlv /home/app/dlv
+WORKDIR /home/app/
 COPY --chown=user:user ./FPRU_crit.sh ./FPRU_crit.sh
 COPY --chown=user:user ./FPRU_high.sh ./FPRU_high.sh
 
-CMD ["/home/user/dlv", "--listen=:40000", "--headless=true", "--api-version=2", "exec", "/home/user/main"]
+CMD ["/home/user/dlv", "--listen=:40000", "--headless=true", "--api-version=2", "exec", "/home/app/main"]
