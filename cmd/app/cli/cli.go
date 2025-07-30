@@ -76,8 +76,9 @@ func initArgs(cmd *cobra.Command) {
 	cmd.MarkFlagsOneRequired("file", "project-id")
 	cmd.MarkFlagsMutuallyExclusive("file", "project-id")
 	cmd.Flags().IntVar(&jobId, "job-id", -1, "Gitlab job id")
-	cmd.Flags().StringVar(&artifactFormat, "artifact-format", "", "Format of report file")
+	cmd.Flags().StringVarP(&artifactFormat, "artifact-format", "a", "", "Format of report file")
+	cmd.MarkFlagRequired("artifact-format")
 	cmd.Flags().StringVar(&artifactFileName, "artifact-file", "", "Filename of artifact")
 	cmd.Flags().IntVar(&mergeRequestIid, "mr-iid", -1, "Merge request internal ID")
-	cmd.MarkFlagsRequiredTogether("project-id", "job-id", "artifact-format", "artifact-file", "mr-iid")
+	cmd.MarkFlagsRequiredTogether("project-id", "job-id", "mr-iid")
 }

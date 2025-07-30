@@ -53,7 +53,9 @@ func (s *EchoServer) Start(port string) error {
 	if s.cfg.RateLimit > 0 {
 		s.e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(s.cfg.RateLimit))))
 	}
-	if err := s.e.Start(port); err != nil && !errors.Is(http.ErrServerClosed, err) {
+	log.Printf("Registered parsers: %s", parser.List())
+	log.Printf("Starting server on port %s", port)
+	if err := s.e.Start(":" + port); err != nil && !errors.Is(http.ErrServerClosed, err) {
 		log.Fatalf("Server shutdown occured: %s", err)
 		return err
 	}

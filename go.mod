@@ -3,7 +3,7 @@ module github.com/Tihmmm/mr-decorator
 go 1.24.5
 
 require (
-	github.com/Tihmmm/mr-decorator-core v0.1.8
+	github.com/Tihmmm/mr-decorator-core v0.1.14
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/labstack/echo/v4 v4.13.4
 	github.com/spf13/cobra v1.9.1

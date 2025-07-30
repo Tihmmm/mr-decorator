@@ -46,7 +46,6 @@ func NewCmd(opts *opts.CmdOpts) *cobra.Command {
 func initArgs(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&port, "port", "p", "3000", "Server port. If not specified and config is not filled, port 3000 will be used.")
 	cmd.Flags().StringVarP(&apiKey, "api-key", "k", "", "Gitlab auth token with `api` scope")
-	cmd.Flags().BoolVarP(&promptApiKey, "prompt-api-key", "p", false, "Prompt for Gitlab token")
-	cmd.MarkFlagsOneRequired("api-key", "prompt-api-key")
+	cmd.Flags().BoolVarP(&promptApiKey, "prompt-api-key", "a", false, "Prompt for Gitlab token")
 	cmd.MarkFlagsMutuallyExclusive("api-key", "prompt-api-key")
 }

@@ -27,7 +27,7 @@ var (
 		Use:     "",
 		Version: "0.1.5",
 		Long: `A merge request decorator for Gitlab. Can be used in either 'cli' or 'server' mode.
-In either mode don't forget to fill the configuration file.
+In either mode, don't forget to fill the configuration file.
 It should be noted that any cli argument will be overwritten by values from configuration file if filled.
        `,
 	}
