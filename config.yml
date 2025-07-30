@@ -19,3 +19,5 @@ parser:
     vuln_mgmt_project_url_tmpl: https://fortify-ssc.example.com/html/ssc/version/%d
     vuln_instance_tmpl: audit?q=instance_id%3A
     report_path: audit?q=analysis_type%3Asca
+  registered_parsers:
+    - fpr

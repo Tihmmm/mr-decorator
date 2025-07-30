@@ -50,7 +50,7 @@ func NewCmd(opts *opts.CmdOpts) *cobra.Command {
 		}
 		prsr.SetConfig(&opts.Cfg.Parser)
 		if err := d.Decorate(mr, prsr); err != nil {
-			log.Fatalf("Error decorating: %s", err)
+			log.Fatal(err)
 		}
 	}
 
