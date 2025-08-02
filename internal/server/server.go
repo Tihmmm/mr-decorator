@@ -31,14 +31,6 @@ type EchoServer struct {
 }
 
 func NewEchoServer(cfg config.ServerConfig, v validator.Validator, d decorator.Decorator) Server {
-	if cfg.ApiKey != "" {
-		var err error
-		apiKeyHash, err = pkg.GetArgonHash(cfg.ApiKey, nil)
-		if err != nil {
-			log.Fatalf("Error getting argon2 hash: %v\n", err)
-		}
-		cfg.ApiKey = apiKeyHash
-	}
 	e := echo.New()
 	if cfg.RateLimit > 0 {
 		e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(cfg.RateLimit))))
@@ -54,6 +46,13 @@ func NewEchoServer(cfg config.ServerConfig, v validator.Validator, d decorator.D
 
 	groupInternal := e.Group("/internal")
 	if cfg.ApiKey != "" {
+		var err error
+		apiKeyHash, err = pkg.GetArgonHash(cfg.ApiKey, nil)
+		if err != nil {
+			log.Fatalf("Error getting argon2 hash: %v\n", err)
+		}
+		cfg.ApiKey = apiKeyHash
+
 		groupInternal.Use(authMiddleware)
 	}
 	groupInternal.POST("/decorate-merge-request", server.DecorateMergeRequest)

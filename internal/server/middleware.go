@@ -9,6 +9,7 @@ import (
 var apiKeyHash string
 
 func authMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+
 	return func(ctx echo.Context) error {
 		apiKeyIn := ctx.Request().Header.Get("Api-Key")
 		if !pkg.CheckArgonHash(apiKeyIn, apiKeyHash) {
