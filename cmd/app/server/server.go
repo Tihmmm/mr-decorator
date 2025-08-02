@@ -48,7 +48,7 @@ func NewCmd(opts *opts.CmdOpts) *cobra.Command {
 
 func initArgs(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&port, "port", "p", "3000", "Server port")
-	cmd.Flags().StringVarP(&apiKey, "api-key", "k", "", "Server api key")
+	cmd.Flags().StringVarP(&apiKey, "api-key", "k", "", "Server api key. This cli option is only used if the `api_key` config field is not filled.")
 	cmd.Flags().BoolVarP(&promptApiKey, "prompt-api-key", "a", false, "Prompt for server api key")
 	cmd.MarkFlagsMutuallyExclusive("api-key", "prompt-api-key")
 }

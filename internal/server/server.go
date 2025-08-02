@@ -19,7 +19,7 @@ import (
 
 type Server interface {
 	Start(port string) error
-	Liveliness(ctx echo.Context) error
+	HealthCheck(ctx echo.Context) error
 	DecorateMergeRequest(ctx echo.Context) error
 }
 
@@ -32,51 +32,47 @@ type EchoServer struct {
 
 func NewEchoServer(cfg config.ServerConfig, v validator.Validator, d decorator.Decorator) Server {
 	if cfg.ApiKey != "" {
-		apiKeyHash, err := pkg.GetArgonHash(cfg.ApiKey, nil)
+		var err error
+		apiKeyHash, err = pkg.GetArgonHash(cfg.ApiKey, nil)
 		if err != nil {
 			log.Fatalf("Error getting argon2 hash: %v\n", err)
 		}
 		cfg.ApiKey = apiKeyHash
 	}
-
+	e := echo.New()
+	if cfg.RateLimit > 0 {
+		e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(cfg.RateLimit))))
+	}
 	server := &EchoServer{
 		cfg: cfg,
-		e:   echo.New(),
+		e:   e,
 		v:   v,
 		d:   d,
 	}
-	server.registerRoutes()
+
+	e.GET("/healthcheck", server.HealthCheck)
+
+	groupInternal := e.Group("/internal")
+	if cfg.ApiKey != "" {
+		groupInternal.Use(authMiddleware)
+	}
+	groupInternal.POST("/decorate-merge-request", server.DecorateMergeRequest)
+
 	return server
 }
 
 func (s *EchoServer) Start(port string) error {
-	if s.cfg.RateLimit > 0 {
-		s.e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(s.cfg.RateLimit))))
-	}
 	log.Printf("Registered parsers: %s", parser.List())
 	log.Printf("Starting server on port %s", port)
-	if err := s.e.Start(":" + port); err != nil && !errors.Is(http.ErrServerClosed, err) {
-		log.Fatalf("Server shutdown occured: %s", err)
-		return err
-	}
-	return nil
+
+	return s.e.Start(":" + port)
 }
 
-func (s *EchoServer) registerRoutes() {
-	s.e.GET("/liveliness", s.Liveliness)
-	s.e.POST("/decorate-merge-request", s.DecorateMergeRequest)
-}
-
-func (s *EchoServer) Liveliness(ctx echo.Context) error {
+func (s *EchoServer) HealthCheck(ctx echo.Context) error {
 	return ctx.String(http.StatusOK, "I am alive!")
 }
 
 func (s *EchoServer) DecorateMergeRequest(ctx echo.Context) error {
-	apiKey := ctx.Request().Header.Get("Api-Key")
-	if s.cfg.ApiKey != "" && !pkg.CheckArgonHash(apiKey, s.cfg.ApiKey) {
-		return ctx.String(http.StatusUnauthorized, "API Key is invalid")
-	}
-
 	mr := new(models.MRRequest)
 	err := ctx.Bind(&mr)
 	if err != nil {
