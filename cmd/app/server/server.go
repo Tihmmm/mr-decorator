@@ -25,7 +25,10 @@ func NewCmd(opts *opts.CmdOpts) *cobra.Command {
 			prsr.SetConfig(&opts.Cfg.Parser)
 		}
 
-		opts.Cfg.Server.ApiKey = apiKey
+		if opts.Cfg.Server.ApiKey == "" {
+			opts.Cfg.Server.ApiKey = apiKey
+		}
+
 		s := server.NewEchoServer(opts.Cfg.Server, opts.V, d)
 		if err := s.Start(port); err != nil {
 			log.Fatalf("Error starting server: %s", err)
@@ -34,7 +37,7 @@ func NewCmd(opts *opts.CmdOpts) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "server",
-		Short: "Launches decorator in server mode",
+		Short: "Launches decorator in server mode.",
 		Run:   run,
 	}
 
@@ -44,8 +47,8 @@ func NewCmd(opts *opts.CmdOpts) *cobra.Command {
 }
 
 func initArgs(cmd *cobra.Command) {
-	cmd.Flags().StringVarP(&port, "port", "p", "3000", "Server port. If not specified and config is not filled, port 3000 will be used.")
-	cmd.Flags().StringVarP(&apiKey, "api-key", "k", "", "Gitlab auth token with `api` scope")
-	cmd.Flags().BoolVarP(&promptApiKey, "prompt-api-key", "a", false, "Prompt for Gitlab token")
+	cmd.Flags().StringVarP(&port, "port", "p", "3000", "Server port")
+	cmd.Flags().StringVarP(&apiKey, "api-key", "k", "", "Server api key")
+	cmd.Flags().BoolVarP(&promptApiKey, "prompt-api-key", "a", false, "Prompt for server api key")
 	cmd.MarkFlagsMutuallyExclusive("api-key", "prompt-api-key")
 }

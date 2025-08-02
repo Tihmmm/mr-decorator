@@ -56,7 +56,7 @@ func NewCmd(opts *opts.CmdOpts) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "cli",
-		Short: "Launches decorator in cli mode",
+		Short: "Launches decorator in cli mode.",
 		Run:   run,
 	}
 
