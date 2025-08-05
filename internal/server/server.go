@@ -92,7 +92,16 @@ func (s *EchoServer) DecorateMergeRequest(ctx echo.Context) error {
 		}
 	}
 
-	go s.d.Decorate(mr, prsr)
-
-	return ctx.String(http.StatusAccepted, http.StatusText(http.StatusAccepted))
+	var waitDecoration bool
+	echo.QueryParamsBinder(ctx).Bool("waitDecoration", &waitDecoration)
+	if waitDecoration {
+		if err := s.d.Decorate(mr, prsr); err != nil {
+			log.Printf("Error decorating merge request: %s", err)
+			return ctx.String(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+		}
+		return ctx.String(http.StatusOK, "Merge request successfully decorated")
+	} else {
+		go s.d.Decorate(mr, prsr)
+		return ctx.String(http.StatusAccepted, http.StatusText(http.StatusAccepted))
+	}
 }
