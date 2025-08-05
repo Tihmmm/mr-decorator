@@ -4,32 +4,39 @@ import (
 	"github.com/Tihmmm/mr-decorator-core/decorator"
 	"github.com/Tihmmm/mr-decorator-core/parser"
 	"github.com/Tihmmm/mr-decorator/cmd/opts"
+	"github.com/Tihmmm/mr-decorator/config"
 	"github.com/Tihmmm/mr-decorator/internal/server"
 	"github.com/spf13/cobra"
 	"log"
 )
 
 var (
-	port         string
-	apiKey       string
-	promptApiKey bool
+	serverConfigPath string
+	port             string
+	apiKey           string
+	promptApiKey     bool
 )
 
 func NewCmd(opts *opts.CmdOpts) *cobra.Command {
-	d := decorator.NewDecorator(decorator.ModeServer, opts.Cfg.Decorator, opts.C)
-
 	run := func(cmd *cobra.Command, args []string) {
 		prsrs := parser.List()
 		for _, k := range prsrs {
 			prsr, _ := parser.Get(k)
-			prsr.SetConfig(&opts.Cfg.Parser)
+			prsr.SetConfig(opts.ParserConfig)
 		}
 
-		if opts.Cfg.Server.ApiKey == "" {
-			opts.Cfg.Server.ApiKey = apiKey
+		serverCfg, err := config.NewConfig(serverConfigPath)
+		if err != nil {
+			log.Fatalf("Error parsing server config: %s\n", err)
 		}
 
-		s := server.NewEchoServer(opts.Cfg.Server, opts.V, d)
+		if serverCfg.ApiKey == "" {
+			serverCfg.ApiKey = apiKey
+		}
+
+		d := decorator.NewDecorator(decorator.ModeServer, *opts.DecoratorConfig, opts.C)
+
+		s := server.NewEchoServer(serverCfg, opts.V, d)
 		if err := s.Start(port); err != nil {
 			log.Fatalf("Error starting server: %s", err)
 		}
@@ -41,12 +48,13 @@ func NewCmd(opts *opts.CmdOpts) *cobra.Command {
 		Run:   run,
 	}
 
-	initArgs(cmd)
+	initArgs(cmd, opts)
 
 	return cmd
 }
 
-func initArgs(cmd *cobra.Command) {
+func initArgs(cmd *cobra.Command, opts *opts.CmdOpts) {
+	cmd.Flags().StringVar(&serverConfigPath, "server-config", opts.ConfigPath, "Path to server configuration file")
 	cmd.Flags().StringVarP(&port, "port", "p", "3000", "Server port")
 	cmd.Flags().StringVarP(&apiKey, "api-key", "k", "", "Server api key. This cli option is only used if the `api_key` config field is not filled.")
 	cmd.Flags().BoolVarP(&promptApiKey, "prompt-api-key", "a", false, "Prompt for server api key")

@@ -7,7 +7,9 @@ import (
 )
 
 type CmdOpts struct {
-	Cfg *config.Config
-	C   client.Client
-	V   validator.Validator
+	ConfigPath      string
+	ParserConfig    *config.ParserConfig
+	DecoratorConfig *config.DecoratorConfig
+	C               client.Client
+	V               validator.Validator
 }

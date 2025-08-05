@@ -23,7 +23,7 @@ var (
 )
 
 func NewCmd(opts *opts.CmdOpts) *cobra.Command {
-	d := decorator.NewDecorator(decorator.ModeCli, opts.Cfg.Decorator, opts.C)
+	d := decorator.NewDecorator(decorator.ModeCli, *opts.DecoratorConfig, opts.C)
 
 	run := func(cmd *cobra.Command, args []string) {
 		mr := &models.MRRequest{
@@ -48,7 +48,7 @@ func NewCmd(opts *opts.CmdOpts) *cobra.Command {
 		if err != nil {
 			log.Fatalf("Error getting parser for format `%s`: %s", mr.ArtifactFormat, err)
 		}
-		prsr.SetConfig(&opts.Cfg.Parser)
+		prsr.SetConfig(opts.ParserConfig)
 		if err := d.Decorate(mr, prsr); err != nil {
 			log.Fatal(err)
 		}

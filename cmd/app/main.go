@@ -42,9 +42,11 @@ func init() {
 	c := client.NewGitlabClient(cfg.GitlabClient)
 	v := validator.NewValidator()
 	cmdOpts := &opts.CmdOpts{
-		Cfg: &cfg,
-		C:   c,
-		V:   v,
+		ConfigPath:      configPath,
+		ParserConfig:    &cfg.Parser,
+		DecoratorConfig: &cfg.Decorator,
+		C:               c,
+		V:               v,
 	}
 
 	rootCmd.AddCommand(cli.NewCmd(cmdOpts))

@@ -3,8 +3,9 @@ module github.com/Tihmmm/mr-decorator
 go 1.24.5
 
 require (
-	github.com/Tihmmm/mr-decorator-core v0.1.23
+	github.com/Tihmmm/mr-decorator-core v0.1.24
 	github.com/alexedwards/argon2id v1.0.0
+	github.com/goccy/go-yaml v1.18.0
 	github.com/labstack/echo/v4 v4.13.4
 	github.com/spf13/cobra v1.9.1
 	golang.org/x/crypto v0.40.0
@@ -18,7 +19,6 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.27.0 // indirect
-	github.com/goccy/go-yaml v1.18.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect

@@ -3,12 +3,12 @@ package server
 import (
 	"errors"
 	"fmt"
-	"github.com/Tihmmm/mr-decorator-core/config"
 	"github.com/Tihmmm/mr-decorator-core/decorator"
 	custErrors "github.com/Tihmmm/mr-decorator-core/errors"
 	"github.com/Tihmmm/mr-decorator-core/models"
 	"github.com/Tihmmm/mr-decorator-core/parser"
 	"github.com/Tihmmm/mr-decorator-core/validator"
+	"github.com/Tihmmm/mr-decorator/config"
 	"github.com/Tihmmm/mr-decorator/pkg"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
