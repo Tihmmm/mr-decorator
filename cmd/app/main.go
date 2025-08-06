@@ -5,6 +5,7 @@ import (
 	"github.com/Tihmmm/mr-decorator-core/config"
 	"github.com/Tihmmm/mr-decorator-core/validator"
 	"github.com/Tihmmm/mr-decorator/cmd/app/cli"
+	"github.com/Tihmmm/mr-decorator/cmd/app/list"
 	"github.com/Tihmmm/mr-decorator/cmd/app/server"
 	"github.com/Tihmmm/mr-decorator/cmd/opts"
 	"github.com/spf13/cobra"
@@ -33,7 +34,7 @@ In either mode, don't forget to fill the configuration file.
 )
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "config.yml", "Path to configuration file. Configuration will be overwritten by cli arguments if provided.")
+	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "config.yml", "Path to configuration file. Configuration will be overwritten by cli arguments if provided")
 
 	cfg, err := config.NewConfig(configPath)
 	if err != nil {
@@ -49,6 +50,7 @@ func init() {
 		V:               v,
 	}
 
+	rootCmd.AddCommand(list.NewCmd())
 	rootCmd.AddCommand(cli.NewCmd(cmdOpts))
 	rootCmd.AddCommand(server.NewCmd(cmdOpts))
 
