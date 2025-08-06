@@ -10,6 +10,7 @@ server:
 gitlab_client:
   ip: 127.0.0.1
   host: gitlab.example.com
+  timeout_seconds: 30
 parser:
   sca:
     vuln_mgmt_project_url_tmpl: https://vuln-mgmt.example.com/project/%s/
@@ -20,4 +21,3 @@ parser:
     vuln_instance_tmpl: audit?q=instance_id%3A
     report_path: audit?q=analysis_type%3Asca
   registered_parsers:
-    - fpr
