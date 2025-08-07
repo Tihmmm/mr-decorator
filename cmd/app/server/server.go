@@ -6,6 +6,7 @@ import (
 	"github.com/Tihmmm/mr-decorator/cmd/opts"
 	"github.com/Tihmmm/mr-decorator/config"
 	"github.com/Tihmmm/mr-decorator/internal/server"
+	"github.com/Tihmmm/mr-decorator/pkg"
 	"github.com/spf13/cobra"
 	"log"
 )
@@ -31,12 +32,17 @@ func NewCmd(opts *opts.CmdOpts) *cobra.Command {
 		}
 
 		if serverCfg.ApiKey == "" {
+			if promptApiKey {
+				if err := pkg.ReadSecretStdinToString("Enter API key for this server: ", &serverCfg.ApiKey); err != nil {
+					log.Fatalln(err)
+				}
+			}
 			serverCfg.ApiKey = apiKey
 		}
 
 		d := decorator.NewDecorator(decorator.ModeServer, *opts.DecoratorConfig, opts.C)
-
 		s := server.NewEchoServer(serverCfg, opts.V, d)
+
 		if err := s.Start(port); err != nil {
 			log.Fatalf("Error starting server: %s", err)
 		}
@@ -44,7 +50,7 @@ func NewCmd(opts *opts.CmdOpts) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "server",
-		Short: "Launches decorator in server mode.",
+		Short: "Launches decorator in server mode",
 		Run:   run,
 	}
 
@@ -54,9 +60,9 @@ func NewCmd(opts *opts.CmdOpts) *cobra.Command {
 }
 
 func initArgs(cmd *cobra.Command, opts *opts.CmdOpts) {
-	cmd.Flags().StringVar(&serverConfigPath, "server-config", opts.ConfigPath, "Path to server configuration file")
-	cmd.Flags().StringVarP(&port, "port", "p", "3000", "Server port")
-	cmd.Flags().StringVarP(&apiKey, "api-key", "k", "", "Server api key. This cli option is only used if the `api_key` config field is not filled")
-	cmd.Flags().BoolVarP(&promptApiKey, "prompt-api-key", "a", false, "Prompt for server api key")
+	cmd.Flags().StringVar(&serverConfigPath, "server-config", opts.ConfigPath, "path to server configuration file")
+	cmd.Flags().StringVarP(&port, "port", "p", "3000", "server port")
+	cmd.Flags().StringVarP(&apiKey, "api-key", "k", "", "this server's api key. this cli option is only used if the `api_key` config field is not filled")
+	cmd.Flags().BoolVarP(&promptApiKey, "prompt-api-key", "a", false, "prompt for server api key")
 	cmd.MarkFlagsMutuallyExclusive("api-key", "prompt-api-key")
 }

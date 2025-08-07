@@ -5,15 +5,15 @@ RUN go mod download
 
 FROM dependencies AS build
 COPY . ./
-RUN CGO_ENABLED=0 go build -o /main -ldflags="-w -s" ./cmd/app/
+RUN CGO_ENABLED=0 go build -o /mrdec -ldflags="-w -s" ./cmd/app/
 
 FROM golang:1.24.5-alpine3.22
 
 RUN addgroup -S app && adduser -SD app -G app
 USER app
 
-COPY --chown=app:app --chmod=550 --from=build /main /home/app/main
+COPY --chown=app:app --chmod=550 --from=build /mrdec /home/app/mrdec
 WORKDIR /home/app/
 COPY --chown=app:app ./FPRU_crit.sh ./FPRU_crit.sh
 COPY --chown=app:app ./FPRU_high.sh ./FPRU_high.sh
-CMD ["./main"]
+CMD ["./mrdec"]

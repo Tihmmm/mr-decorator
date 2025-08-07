@@ -13,28 +13,27 @@ import (
 	"os"
 )
 
-func main() {
-	if err := rootCmd.Execute(); err != nil {
-		log.Println(err)
-		os.Exit(1)
-	}
-
-}
-
 var (
 	configPath string
 
 	rootCmd = &cobra.Command{
 		Use:     "",
-		Version: "0.1.5",
+		Version: "Alpha",
 		Long: `A merge request decorator for Gitlab. Can be used in either 'cli' or 'server' mode.
 In either mode, don't forget to fill the configuration file.
 `,
 	}
 )
 
+func main() {
+	if err := rootCmd.Execute(); err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+}
+
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "config.yml", "Path to configuration file. Configuration will be overwritten by cli arguments if provided")
+	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "config.yml", "path to configuration file. configuration will be overwritten by cli arguments if provided")
 
 	cfg, err := config.NewConfig(configPath)
 	if err != nil {

@@ -5,8 +5,12 @@ import (
 	"log"
 )
 
-func ReadSecretStdinToString(dest *string) error {
-	log.Println("Enter the secret: ")
+func ReadSecretStdinToString(promptMessage string, dest *string) error {
+	if promptMessage == "" {
+		promptMessage = "Enter the secret: "
+	}
+
+	log.Println(promptMessage)
 	secretBytes, err := terminal.ReadPassword(0)
 	if err != nil {
 		return err

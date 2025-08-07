@@ -15,7 +15,7 @@ func NewCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "list",
 		Aliases: []string{"l", "ls"},
-		Short:   "Lists available parsers.",
+		Short:   "Lists available parsers",
 		Run:     run,
 	}
 
