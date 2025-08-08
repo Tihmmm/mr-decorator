@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/Tihmmm/mr-decorator-core/client"
 	"github.com/Tihmmm/mr-decorator-core/config"
 	"github.com/Tihmmm/mr-decorator-core/validator"
@@ -9,8 +12,6 @@ import (
 	"github.com/Tihmmm/mr-decorator/cmd/app/server"
 	"github.com/Tihmmm/mr-decorator/cmd/opts"
 	"github.com/spf13/cobra"
-	"log"
-	"os"
 )
 
 var (

@@ -1,8 +1,9 @@
 package pkg
 
 import (
-	"golang.org/x/crypto/ssh/terminal"
 	"log"
+
+	"golang.org/x/term"
 )
 
 func ReadSecretStdinToString(promptMessage string, dest *string) error {
@@ -11,7 +12,7 @@ func ReadSecretStdinToString(promptMessage string, dest *string) error {
 	}
 
 	log.Println(promptMessage)
-	secretBytes, err := terminal.ReadPassword(0)
+	secretBytes, err := term.ReadPassword(0)
 	if err != nil {
 		return err
 	}
