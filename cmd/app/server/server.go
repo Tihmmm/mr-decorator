@@ -1,6 +1,8 @@
 package server
 
 import (
+	"log"
+
 	"github.com/Tihmmm/mr-decorator-core/decorator"
 	"github.com/Tihmmm/mr-decorator-core/parser"
 	"github.com/Tihmmm/mr-decorator/cmd/opts"
@@ -8,7 +10,6 @@ import (
 	"github.com/Tihmmm/mr-decorator/internal/server"
 	"github.com/Tihmmm/mr-decorator/pkg"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 var (

@@ -1,18 +1,12 @@
 package pkg
 
 import (
-	"crypto/rand"
-	"github.com/alexedwards/argon2id"
 	"log"
+
+	"github.com/alexedwards/argon2id"
 )
 
 func GetArgonHash(secret string, params *argon2id.Params) (string, error) {
-	salt := make([]byte, 16)
-	_, err := rand.Read(salt)
-	if err != nil {
-		return "", err
-	}
-
 	if params == nil {
 		params = argon2id.DefaultParams
 	}

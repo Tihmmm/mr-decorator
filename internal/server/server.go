@@ -3,6 +3,9 @@ package server
 import (
 	"errors"
 	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/Tihmmm/mr-decorator-core/decorator"
 	custErrors "github.com/Tihmmm/mr-decorator-core/errors"
 	"github.com/Tihmmm/mr-decorator-core/models"
@@ -13,8 +16,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/time/rate"
-	"log"
-	"net/http"
 )
 
 type Server interface {
@@ -32,6 +33,8 @@ type EchoServer struct {
 
 func NewEchoServer(cfg config.ServerConfig, v validator.Validator, d decorator.Decorator) Server {
 	e := echo.New()
+	e.Use(middleware.Recover())
+	e.Use(middleware.BodyLimit("2M"))
 	if cfg.RateLimit > 0 {
 		e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(cfg.RateLimit))))
 	}
@@ -43,7 +46,6 @@ func NewEchoServer(cfg config.ServerConfig, v validator.Validator, d decorator.D
 	}
 
 	e.GET("/healthcheck", server.HealthCheck)
-
 	groupInternal := e.Group("/internal")
 	if cfg.ApiKey != "" {
 		var err error
@@ -54,6 +56,8 @@ func NewEchoServer(cfg config.ServerConfig, v validator.Validator, d decorator.D
 		cfg.ApiKey = apiKeyHash
 
 		groupInternal.Use(authMiddleware)
+	} else {
+		log.Printf("No API key configured. `/internal` endpoints are not authenticated")
 	}
 	groupInternal.POST("/decorate-merge-request", server.DecorateMergeRequest)
 

@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/goccy/go-yaml"
 	"os"
+
+	"github.com/goccy/go-yaml"
 )
 
 type ServerConfig struct {

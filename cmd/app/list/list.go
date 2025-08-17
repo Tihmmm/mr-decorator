@@ -1,9 +1,10 @@
 package list
 
 import (
+	"log"
+
 	"github.com/Tihmmm/mr-decorator-core/parser"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 func NewCmd() *cobra.Command {

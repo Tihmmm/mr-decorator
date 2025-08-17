@@ -1,9 +1,10 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/Tihmmm/mr-decorator/pkg"
 	"github.com/labstack/echo/v4"
-	"net/http"
 )
 
 var apiKeyHash string
