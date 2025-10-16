@@ -11,9 +11,9 @@ import (
 
 type ServerConfig struct {
 	Port             string   `yaml:"port" default:"3000"`
-	RateLimit        int      `yaml:"rate_limit" default:"3"`
 	ApiKey           string   `yaml:"api_key"`
 	SupportedFormats []string `yaml:"supported_formats"`
+	RateLimit        int      `yaml:"rate_limit" default:"3"`
 }
 
 func NewConfig(path string) (ServerConfig, error) {

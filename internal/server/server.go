@@ -25,10 +25,10 @@ type Server interface {
 }
 
 type EchoServer struct {
-	cfg config.ServerConfig
-	e   *echo.Echo
 	v   validator.Validator
 	d   decorator.Decorator
+	e   *echo.Echo
+	cfg config.ServerConfig
 }
 
 func NewEchoServer(cfg config.ServerConfig, v validator.Validator, d decorator.Decorator) Server {
