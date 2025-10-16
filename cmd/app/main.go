@@ -35,6 +35,7 @@ func main() {
 
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "config.yml", "path to configuration file. configuration will be overwritten by cli arguments if provided")
+	rootCmd.PersistentFlags().Parse(os.Args[1:])
 
 	cfg, err := config.NewConfig(configPath)
 	if err != nil {
